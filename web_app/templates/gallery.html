@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Gallery - WebOpti AI Studio{% endblock %}
+{% block page_title %}Product Output Gallery{% endblock %}
+{% block page_subtitle %}Browse generated AI 4-angle views and optimized WebP images{% endblock %}
+
+{% block content %}
+<div class="gallery-container">
+    {% if not has_outputs %}
+    <div class="empty-state card glass-card">
+        <div class="empty-icon">🖼️</div>
+        <h3>No Processed Products Found</h3>
+        <p>Run the WebOpti pipeline from the Dashboard to generate AI product views and WebP images.</p>
+        <a href="{% url 'index' %}" class="btn btn-primary">Go to Dashboard</a>
+    </div>
+    {% else %}
+    <div class="gallery-toolbar">
+        <button class="btn btn-danger" onclick="clearGallery()">🗑️ Clear Output Gallery</button>
+    </div>
+    <div class="products-grid">
+        {% for product in products %}
+        <div class="card glass-card product-card">
+            <div class="product-card-header">
+                <h4>💎 {{ product.name }}</h4>
+                <span class="badge badge-info">{{ product.views|length }} Views</span>
+            </div>
+
+            <div class="views-grid">
+                {% for view in product.views %}
+                <div class="view-item" onclick="openModal('{{ view.path }}', '{{ product.name }} - {{ view.angle }}')">
+                    <div class="image-wrapper">
+                        <img src="{{ view.path }}" alt="{{ view.angle }}" loading="lazy">
+                        <span class="view-badge">{{ view.angle }}</span>
+                    </div>
+                    <div class="view-details">
+                        <span>{{ view.filename }}</span>
+                        <a href="{{ view.path }}" download class="download-link">⬇ Save</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- Image Modal Viewer -->
+<div id="image-modal" class="modal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <h3 id="modal-title">Product Image View</h3>
+        <div class="modal-image-container">
+            <img id="modal-img" src="" alt="View">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openModal(src, title) {
+    document.getElementById('modal-img').src = src;
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('image-modal').classList.add('active');
+}
+function closeModal() {
+    document.getElementById('image-modal').classList.remove('active');
+}
+function clearGallery() {
+    if (confirm('Are you sure you want to clear all generated AI views and WebP output files?')) {
+        fetch('/api/clear_gallery/', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

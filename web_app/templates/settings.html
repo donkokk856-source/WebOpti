@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - WebOpti AI Studio{% endblock %}
+{% block page_title %}Provider & API Settings{% endblock %}
+{% block page_subtitle %}Configure your AI image generation provider credentials and environment variables{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <div class="card glass-card settings-card">
+        <div class="card-header">
+            <h3>🔑 Environment Configuration</h3>
+            <span class="badge badge-info">.env File</span>
+        </div>
+
+        <form id="settings-form" class="settings-form">
+            <div class="form-group">
+                <label for="api_key">IMAGE_API_KEY</label>
+                <div class="input-with-icon">
+                    <span class="input-icon">🔐</span>
+                    <input type="password" id="api_key" name="api_key" value="{{ api_key }}" placeholder="AIzaSy... or your secret key">
+                    <button type="button" class="btn-toggle-vis" onclick="togglePasswordVis()">👁️</button>
+                </div>
+                <small class="help-text">Your API key for Google Gemini, Stability AI, Fal.ai, or custom provider.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="api_endpoint">IMAGE_API_ENDPOINT</label>
+                <div class="input-with-icon">
+                    <span class="input-icon">🌐</span>
+                    <input type="text" id="api_endpoint" name="api_endpoint" value="{{ api_endpoint }}" placeholder="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent">
+                </div>
+                <small class="help-text">The REST API URL endpoint for image generation requests.</small>
+            </div>
+
+            <div id="settings-alert" class="alert-box" style="display: none;"></div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="saveSettings()">
+                    <span>💾 Save Credentials</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card glass-card info-card">
+        <h3>ℹ️ Supported API Providers</h3>
+        <p>WebOpti uses an isolated HTTP adapter supporting:</p>
+        <ul class="provider-list">
+            <li><strong>Google Gemini / Nano Banana API:</strong> <code>https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent</code></li>
+            <li><strong>Stability AI:</strong> <code>https://api.stability.ai/v1/generation/...</code></li>
+            <li><strong>Fal.ai:</strong> <code>https://api.fal.ai/v1/models/flux-image-to-image</code></li>
+            <li><strong>Custom REST APIs:</strong> Accepts standard JSON payloads containing <code>{prompt, image}</code> base64 data.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function togglePasswordVis() {
+    const input = document.getElementById('api_key');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function saveSettings() {
+    const formData = new FormData(document.getElementById('settings-form'));
+    fetch('/api/save_settings/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        const alertBox = document.getElementById('settings-alert');
+        alertBox.style.display = 'block';
+        if (data.success) {
+            alertBox.className = 'alert-box alert-success';
+            alertBox.textContent = '✓ Settings saved to .env file.';
+        } else {
+            alertBox.className = 'alert-box alert-danger';
+            alertBox.textContent = '❌ Error saving settings.';
+        }
+    });
+}
+</script>
+{% endblock %}

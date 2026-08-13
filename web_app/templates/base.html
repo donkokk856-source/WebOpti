@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WebOpti Studio{% endblock %}</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon">✨</div>
+                <div class="brand-text">
+                    <h1>WebOpti</h1>
+                    <span>AI Jewelry Studio</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="{% url 'index' %}" class="nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                    <span class="icon">⚡</span>
+                    <span class="label">Dashboard</span>
+                </a>
+                <a href="{% url 'gallery' %}" class="nav-item {% if request.resolver_match.url_name == 'gallery' %}active{% endif %}">
+                    <span class="icon">🖼️</span>
+                    <span class="label">Gallery</span>
+                </a>
+                <a href="{% url 'settings' %}" class="nav-item {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
+                    <span class="icon">⚙️</span>
+                    <span class="label">Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="dot pulse"></span>
+                    <span class="status-text">WebOpti v2.0 Ready</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-title">
+                    <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+                    <p class="subtitle">{% block page_subtitle %}AI Product View Generator & WebP Optimizer{% endblock %}</p>
+                </div>
+                <div class="header-actions">
+                    <a href="{% url 'gallery' %}" class="btn btn-secondary">
+                        <span>View Outputs</span>
+                    </a>
+                </div>
+            </header>
+
+            <div class="content-body">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/app.js' %}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

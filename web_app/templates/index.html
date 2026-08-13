@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - WebOpti AI Studio{% endblock %}
+{% block page_title %}Pipeline Dashboard{% endblock %}
+{% block page_subtitle %}Generate consistent 4-angle product imagery and compress to WebP in real-time{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <!-- Config & Control Panel Card -->
+    <div class="card glass-card control-card">
+        <div class="card-header">
+            <h3>🎛️ Execution Controls</h3>
+            {% if not api_configured %}
+            <div class="badge badge-warning">⚠️ API Key Not Configured</div>
+            {% else %}
+            <div class="badge badge-success">✓ AI Provider Configured</div>
+            {% endif %}
+        </div>
+
+        <form id="pipeline-form" class="pipeline-form">
+            <div class="form-group">
+                <label for="input_folder">Local Input Folder Path</label>
+                <div class="input-with-icon">
+                    <span class="input-icon"></span>
+                    <input type="text" id="input_folder" name="input_folder" value="{{ input_folder }}"
+                        placeholder="C:\path\to\your\images">
+                </div>
+                <small class="help-text">Contains original product photos (.jpg, .png, .webp, .tiff, .bmp)</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="quality">WebP Quality (1 - 100)</label>
+                    <input type="number" id="quality" name="quality" value="{{ default_quality }}" min="1" max="100">
+                </div>
+                <div class="form-group half">
+                    <label for="batch_size">Batch Size (Products)</label>
+                    <input type="number" id="batch_size" name="batch_size" value="{{ default_batch_size }}" min="1"
+                        max="50">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="workers">Workers (Threads)</label>
+                    <input type="number" id="workers" name="workers" value="{{ default_workers }}" min="1" max="16">
+                </div>
+                <div class="form-group half options-group">
+                    <label>Options</label>
+                    <div class="checkbox-container">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="overwrite" name="overwrite">
+                            <span class="checkmark"></span>
+                            <span>Replace existing files</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-primary" onclick="startJob('full')">
+                    <span>✨ Run Full Pipeline (AI + WebP)</span>
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="startJob('convert')">
+                    <span>⚡ WebP Conversion Only</span>
+                </button>
+                <button type="button" class="btn btn-outline" onclick="startJob('dry_run')">
+                    <span>🧪 Cost Check (Dry Run)</span>
+                </button>
+                <button type="button" id="btn-stop" class="btn btn-danger" onclick="stopJob()" style="display: none;">
+                    <span>🛑 Stop Running Job</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Live Execution Status Card -->
+    <div class="card glass-card status-card">
+        <div class="card-header">
+            <h3>📊 Live Progress Monitor</h3>
+            <span id="job-badge" class="badge badge-neutral">Idle</span>
+        </div>
+
+        <div class="status-body">
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span id="active-product-label">No active job running</span>
+                    <span id="progress-percentage">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span class="metric-title">Products Processed</span>
+                    <span id="metric-products" class="metric-value">0 / 0</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-title">AI Views Generated</span>
+                    <span id="metric-ai" class="metric-value">0</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-title">WebP Converted</span>
+                    <span id="metric-webp" class="metric-value">0</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-title">Saved Space</span>
+                    <span id="metric-saved" class="metric-value">0 B</span>
+                </div>
+            </div>
+
+            <!-- Terminal Log Window -->
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-title">WebOpti System Log</span>
+                </div>
+                <div id="terminal-logs" class="terminal-body">
+                    <div class="log-line text-muted">[System] Ready. Configure your settings and click Run to start.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

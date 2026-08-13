@@ -1,0 +1,13 @@
+.env
+__pycache__/
+*.py[cod]
+generated_images/*
+!generated_images/.gitkeep
+output_images/*
+!output_images/.gitkeep
+logs/*.log
+.vscode/
+.idea/
+*.tmp
+db.sqlite3
+
