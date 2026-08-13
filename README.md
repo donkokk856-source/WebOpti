@@ -1,103 +1,146 @@
-# WebOpti
+# 💎 WebOpti: AI Product Image Generator & WebP Optimization Studio
 
-WebOpti is a local CLI for jewelry e-commerce imagery. Use it as a standalone WebP optimizer, as a reference-image AI generator, or as a full pipeline that generates four product views and optimizes them to WebP.
+**WebOpti** is a production-grade AI-powered product image generation pipeline and WebP image optimization tool. It allows e-commerce brands, photographers, and developers to automatically generate **4 professional product angles** from a single reference image while strictly preserving the original product's identity, geometry, materials, and colors.
 
-It recursively supports JPG/JPEG, PNG, WebP, TIFF, and BMP; retains filenames, Unicode, spaces, and subfolders; applies EXIF orientation; preserves transparency; avoids upscaling; and keeps processing after a bad file.
+It features both a **Command-Line Interface (CLI)** and a **Django Web UI Dashboard** with live execution monitoring, output gallery, and settings management.
 
-## Install and folders
+---
 
-Use Python 3.12+ and install dependencies from the project folder:
+## 🌟 Key Features
+
+- **🤖 4-Angle AI Product Generation**:
+  1. **CLOSE-UP**: High-detail macro view focusing on decorative elements and craft.
+  2. **45-DEGREE**: Three-quarter view showing front design and product depth.
+  3. **SIDE / LOW-ANGLE**: Profile view accentuating thickness and silhouette.
+  4. **TOP-DOWN**: 90-degree overhead catalog view cleanly centered in frame.
+- **🛡️ Authoritative Product Preservation**:
+  Strict prompt design ensures the AI changes **only the camera angle and presentation**, forbidding redesigns, shape alterations, color changes, added/removed elements, or extra objects.
+- **⚡ Batch WebP Converter & Compression**:
+  Recursively processes JPG, JPEG, PNG, WebP, TIFF, and BMP images, converting them to lossy WebP format with size compression statistics (space saved & compression %).
+- **🖥️ Django Web UI Dashboard**:
+  - **Live Execution Monitor**: Real-time progress bar, product status checklist, and live terminal logs.
+  - **Product Output Gallery**: Visual card grid to inspect, compare, and download generated WebP views with a **1-Click Clear Output Gallery** option.
+  - **Settings Manager**: Web interface to manage credentials (`IMAGE_API_KEY`, `IMAGE_API_ENDPOINT`).
+- **🔌 Multi-Provider Support**:
+  Native support for **Google Gemini (Nano Banana / Flash Image)**, **xAI (Grok)**, **Stability AI**, **Fal.ai**, and generic REST API endpoints.
+- **🛡️ Rate-Limiting & Error Resilience**:
+  - Automatic retry with exponential backoff on `HTTP 429 Too Many Requests`.
+  - Image quality validation using Pillow before saving outputs.
+  - Non-terminating batch processing: individual failures do not stop the pipeline.
+- **🧪 Cost Control**: `--dry-run` mode reports planned API requests without making cloud calls.
+
+---
+
+## 📂 Project Structure
+
+```text
+WebOpti/
+│
+├── main.py                # Command-Line Interface (CLI) entry point
+├── generator.py           # AI generation prompts, provider adapter & retries
+├── converter.py           # Image discovery, resizing & WebP conversion engine
+├── config.py              # Default pipeline settings & parameters
+├── utils.py                # Logging setup & Pillow image validation
+├── test_pipeline.py       # Automated unit test suite
+├── requirements.txt       # Python dependencies (Pillow, requests, python-dotenv, django)
+├── .env.example           # Environment template (API keys & endpoints)
+├── .gitignore             # Git exclusions (credentials, logs, caches)
+├── README.md              # Project documentation
+│
+├── webopti_web/           # Django project configuration
+├── web_app/               # Django application (views, URLs, static assets, templates)
+│   ├── static/            # Dark glassmorphic CSS & frontend JS scripts
+│   └── templates/         # Dashboard, Gallery, & Settings HTML templates
+│
+├── input_images/          # Source product photos
+├── generated_images/      # Generated PNG multi-angle images
+├── output_images/         # Converted WebP optimized images
+└── logs/                  # Application execution logs (webopti.log)
+```
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Requirements
+- Python 3.10+
+- Installed dependencies from `requirements.txt`:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Place original product photos under `input_images/`. The tool creates these result paths for `input_images/summer/Celeste Star Ring 250.jpg`:
+### 2. Configure Credentials (`.env`)
+Copy `.env.example` to `.env` and fill in your API provider key and endpoint URL:
 
-```text
-generated_images/summer/Celeste Star Ring 250/
-├── closeup.png
-├── 45degree.png
-├── side.png
-└── top.png
-
-output_images/summer/Celeste Star Ring 250/
-├── closeup.webp
-├── 45degree.webp
-├── side.webp
-└── top.webp
+```ini
+IMAGE_API_KEY=your_actual_api_key
+IMAGE_API_ENDPOINT=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
 ```
 
-## Convert only
+*Or configure these credentials visually via the Settings page in the Django Web UI.*
 
-The original converter behavior remains the default:
+---
+
+## 🌐 Running the Django Web UI
+
+Start the Django local development server:
 
 ```bash
-python main.py
-python main.py --convert --input input_images --output output_images
-python main.py --quality 88
-python main.py --max-width 2000 --max-height 2000
+python manage.py runserver 8000
 ```
 
-Quality defaults to 85. A higher quality preserves more fine detail but creates larger files. Maximum dimensions retain the original aspect ratio and only downscale; WebOpti never upscales. Existing output files are skipped unless explicitly replaced:
+Open your browser and navigate to:
+👉 **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**
+
+- **Dashboard**: Set local input folder, WebP quality, batch size, workers, and launch full AI + WebP pipelines.
+- **Gallery**: View product cards, preview images in full-screen modal, download WebP files, or clear outputs.
+- **Settings**: Manage API credentials safely.
+
+---
+
+## 🖥️ Command-Line Interface (CLI) Usage
+
+### 1. WebP Conversion Only
+Convert product photos directly into WebP format:
 
 ```bash
-python main.py --convert --overwrite
+python main.py --convert
+python main.py --input "C:\path\to\your\images" --convert --quality 85
 ```
 
-## Configure AI generation
-
-Copy `.env.example` to `.env`, then fill in the credentials for your chosen provider:
-
-```text
-IMAGE_API_KEY=your-secret-key
-IMAGE_API_ENDPOINT=https://your-provider.example/v1/image-to-image
-```
-
-`.env` is ignored by Git and must not be committed. The provider is isolated in `generator.py`, so replacing it with an official SDK adapter does not affect conversion or CLI code.
-
-The included HTTP adapter posts JSON with a bearer token:
-
-```json
-{"prompt": "...", "image": "data:image/jpeg;base64,..."}
-```
-
-It accepts a JSON response with an image in one of these forms: `{"b64_json":"..."}`, `{"image_base64":"..."}`, `{"image":"..."}`, a `data` object/list containing one of those fields, or `{"url":"https://..."}`. If your provider differs, update only `HttpImageGenerationProvider.generate()` in `generator.py` or add an SDK-backed provider implementing its `generate(reference, prompt) -> bytes` interface.
-
-## Generate views
+### 2. Cost Control Check (Dry Run)
+Preview the planned AI generations without sending API requests:
 
 ```bash
-python main.py --generate
-python main.py --generate --input input_images --generated generated_images
-python main.py --generate --convert --quality 85 --max-width 2000
+python main.py --input "C:\path\to\your\images" --generate --dry-run
 ```
 
-Each reference gets four separate, product-preserving prompts: close-up, 45-degree three-quarter, low side-angle, and top-down. The base prompt explicitly treats the upload as authoritative and forbids changing its identity, shape, materials, colors, gemstones, charms, proportions, or decorative details. Every angle also forbids people, hands, models, text, watermarks, packaging, added objects, and extra jewelry.
-
-Generation is purposely controlled: `--batch-size` determines how many products are staged at once and `--workers` caps concurrent products/API requests. Each angle retries up to three times and a failure never stops the rest of the batch.
+### 3. Full Pipeline (AI Generation + WebP Optimization)
+Generate 4 AI views per product and optimize them to WebP:
 
 ```bash
-python main.py --generate --convert --batch-size 5 --workers 3
+python main.py --input "C:\path\to\your\images" --generate --convert --batch-size 1 --workers 1
 ```
 
-## Cost-safe planning
-
-Before making paid API calls, use dry run:
+### 4. Clear Output Gallery from CLI
+Remove all generated PNGs and WebP files from output folders:
 
 ```bash
-python main.py --generate --dry-run
+python main.py --clear
 ```
 
-It scans the images and reports the exact number of planned calls (`products × 4`) without contacting the provider or creating images.
+---
 
-## Reports and troubleshooting
+## 🧪 Running Automated Unit Tests
 
-At completion, WebOpti shows generated/failed AI images, converted/failed WebP images, comparable source and final sizes, space saved, compression percentage, and elapsed time. Size statistics count only successful conversions from that run. Detailed product, angle, request, validation, error, dimensions, and file-size records are in `logs/webopti.log`.
+Run the test suite to verify image validation, prompt construction, retries, and converter logic:
 
-- **Missing API settings:** create `.env` from `.env.example` or set both environment variables in your shell.
-- **Existing generated/converted image:** it is skipped unless you add `--overwrite`.
-- **Bad input or AI output:** the relevant item is listed as failed; all other items continue. Inspect `logs/webopti.log`.
-- **Provider returns a different payload:** adapt `HttpImageGenerationProvider.generate()` as described above.
-- **Pillow WebP error:** update Pillow: `pip install --upgrade Pillow`.
+```bash
+python -m unittest test_pipeline.py
+```
 
-Run `python main.py --help` for the full argument list.
+---
+
+## 📄 License
+This project is licensed under the MIT License.
