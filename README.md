@@ -1,4 +1,4 @@
-# 💎 WebOpti: AI Product Image Generator & WebP Optimization Studio
+# WebOpti: AI Product Image Generator & WebP Optimization Studio
 
 **WebOpti** is a production-grade AI-powered product image generation pipeline and WebP image optimization tool. It allows e-commerce brands, photographers, and developers to automatically generate **4 professional product angles** from a single reference image while strictly preserving the original product's identity, geometry, materials, and colors.
 
@@ -6,28 +6,28 @@ It features both a **Command-Line Interface (CLI)** and a **Django Web UI Dashbo
 
 ---
 
-## 🌟 Key Features
+##  Key Features
 
-- **🤖 4-Angle AI Product Generation**:
+- ** 4-Angle AI Product Generation**:
   1. **CLOSE-UP**: High-detail macro view focusing on decorative elements and craft.
   2. **45-DEGREE**: Three-quarter view showing front design and product depth.
   3. **SIDE / LOW-ANGLE**: Profile view accentuating thickness and silhouette.
   4. **TOP-DOWN**: 90-degree overhead catalog view cleanly centered in frame.
-- **🛡️ Authoritative Product Preservation**:
+- ** Authoritative Product Preservation**:
   Strict prompt design ensures the AI changes **only the camera angle and presentation**, forbidding redesigns, shape alterations, color changes, added/removed elements, or extra objects.
-- **⚡ Batch WebP Converter & Compression**:
+- ** Batch WebP Converter & Compression**:
   Recursively processes JPG, JPEG, PNG, WebP, TIFF, and BMP images, converting them to lossy WebP format with size compression statistics (space saved & compression %).
-- **🖥️ Django Web UI Dashboard**:
+- ** Django Web UI Dashboard**:
   - **Live Execution Monitor**: Real-time progress bar, product status checklist, and live terminal logs.
   - **Product Output Gallery**: Visual card grid to inspect, compare, and download generated WebP views with a **1-Click Clear Output Gallery** option.
   - **Settings Manager**: Web interface to manage credentials (`IMAGE_API_KEY`, `IMAGE_API_ENDPOINT`).
-- **🔌 Multi-Provider Support**:
+- ** Multi-Provider Support**:
   Native support for **Google Gemini (Nano Banana / Flash Image)**, **xAI (Grok)**, **Stability AI**, **Fal.ai**, and generic REST API endpoints.
-- **🛡️ Rate-Limiting & Error Resilience**:
+- ** Rate-Limiting & Error Resilience**:
   - Automatic retry with exponential backoff on `HTTP 429 Too Many Requests`.
   - Image quality validation using Pillow before saving outputs.
   - Non-terminating batch processing: individual failures do not stop the pipeline.
-- **🧪 Cost Control**: `--dry-run` mode reports planned API requests without making cloud calls.
+- ** Cost Control**: `--dry-run` mode reports planned API requests without making cloud calls.
 
 ---
 
@@ -60,7 +60,7 @@ WebOpti/
 
 ---
 
-## ⚙️ Installation & Setup
+##  Installation & Setup
 
 ### 1. Requirements
 - Python 3.10+
@@ -82,7 +82,7 @@ IMAGE_API_ENDPOINT=https://generativelanguage.googleapis.com/v1beta/models/gemin
 
 ---
 
-## 🌐 Running the Django Web UI
+##  Running the Django Web UI
 
 Start the Django local development server:
 
@@ -91,7 +91,7 @@ python manage.py runserver 8000
 ```
 
 Open your browser and navigate to:
-👉 **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**
+ **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**
 
 - **Dashboard**: Set local input folder, WebP quality, batch size, workers, and launch full AI + WebP pipelines.
 - **Gallery**: View product cards, preview images in full-screen modal, download WebP files, or clear outputs.
@@ -99,7 +99,7 @@ Open your browser and navigate to:
 
 ---
 
-## 🖥️ Command-Line Interface (CLI) Usage
+##  Command-Line Interface (CLI) Usage
 
 ### 1. WebP Conversion Only
 Convert product photos directly into WebP format:
@@ -132,7 +132,7 @@ python main.py --clear
 
 ---
 
-## 🧪 Running Automated Unit Tests
+##  Running Automated Unit Tests
 
 Run the test suite to verify image validation, prompt construction, retries, and converter logic:
 
